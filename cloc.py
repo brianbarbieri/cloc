@@ -79,10 +79,12 @@ def visualize_info(info_dict):
     total_files: int = sum(info["# of files"] for info in info_dict.values())
 
     print("-------------------------------------------------------------------------------")
-    for ext, data in sorted_info:
-        print(f"{ext:20} {data['# of files']:10} {data['empty_lines']:10} {data['line_count']:10}")
+    print(f"{'Extension':20} {'# of files':20} {'# of empty lines':20} {'line count':20}")
     print("-------------------------------------------------------------------------------")
-    print(f"{'Sum:':20} {total_files:10} {total_empty_lines:10} {total_line_count:10}")
+    for ext, data in sorted_info:
+        print(f"{ext:20} {data['# of files']:<20} {data['empty_lines']:<20} {data['line_count']:<20}")
+    print("-------------------------------------------------------------------------------")
+    print(f"{'Sum:':20} {total_files:<20} {total_empty_lines:<20} {total_line_count:<20}")
     print("-------------------------------------------------------------------------------")
     
 def show_empty_lines(directory, git_ignore_path):    
