@@ -1,10 +1,22 @@
 import os
-from gitignore_parser import parse_gitignore # type: ignore
+from typing import Callable, List
 import argparse
 
-def list_files_with_extensions(directory, git_ignore_path):    
-    # Parse .gitignore if it exists
-    is_ignored = parse_gitignore(git_ignore_path) if os.path.exists(git_ignore_path) else lambda x: False
+from gitignore_parser import parse_gitignore # type: ignore
+
+
+def list_files_with_extensions(directory : str, git_ignore_path: str):    
+    """
+    Scans the given directory and returns a dictionary of file types and their
+    corresponding line counts.
+
+    Ignores directories and files specified in the given .gitignore file.
+
+    :param directory: The directory to scan
+    :param git_ignore_path: The path to the .gitignore file
+    :return: A dictionary of file types and their corresponding line counts
+    """
+    is_ignored: Callable[[str], bool]  = parse_gitignore(git_ignore_path) if os.path.exists(git_ignore_path) else lambda x: False
 
     files_with_info = []
     for root, dirs, files in os.walk(directory):
@@ -12,7 +24,7 @@ def list_files_with_extensions(directory, git_ignore_path):
         dirs[:] = [d for d in dirs if not is_ignored(os.path.join(root, d))]
         
         for file in files:
-            file_path = os.path.join(root, file)
+            file_path: str = os.path.join(root, file)
             
             # Skip ignored files
             if is_ignored(file_path):
@@ -46,7 +58,15 @@ def list_files_with_extensions(directory, git_ignore_path):
     return info_dict
 
 def visualize_info(info_dict):
-    # Sort the dictionary and store the result in a list of tuples
+    """
+    Sort the dictionary of file extensions and their corresponding line counts,
+    empty line counts, and number of files, and print the results in a nicely
+    formatted table.
+
+    :param info_dict: A dictionary where the keys are file extensions and the
+                      values are dictionaries with the keys "line_count",
+                      "empty_lines", and "# of files".
+    """
     sorted_info = sorted(
         info_dict.items(),
         key=lambda x: x[1]["line_count"],
@@ -54,9 +74,9 @@ def visualize_info(info_dict):
     )
 
     # Calculate totals
-    total_line_count = sum(info["line_count"] for info in info_dict.values())
-    total_empty_lines = sum(info["empty_lines"] for info in info_dict.values())
-    total_files = sum(info["# of files"] for info in info_dict.values())
+    total_line_count: int = sum(info["line_count"] for info in info_dict.values())
+    total_empty_lines: int = sum(info["empty_lines"] for info in info_dict.values())
+    total_files: int = sum(info["# of files"] for info in info_dict.values())
 
     print("-------------------------------------------------------------------------------")
     for ext, data in sorted_info:
@@ -66,8 +86,12 @@ def visualize_info(info_dict):
     print("-------------------------------------------------------------------------------")
     
 def show_empty_lines(directory, git_ignore_path):    
-    # Parse .gitignore if it exists
-    is_ignored = parse_gitignore(git_ignore_path) if os.path.exists(git_ignore_path) else lambda x: False
+    """
+    Scans the given directory and prints out all empty lines in the files found.
+
+    Ignores directories and files specified in the given .gitignore file.
+    """
+    is_ignored: Callable[[str], bool] = parse_gitignore(git_ignore_path) if os.path.exists(git_ignore_path) else lambda x: False
     for root, dirs, files in os.walk(directory):
         # Filter out ignored directories
         dirs[:] = [d for d in dirs if not is_ignored(os.path.join(root, d))]
@@ -85,7 +109,7 @@ def show_empty_lines(directory, git_ignore_path):
                 # Count the lines in the file
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                     lines = f.readlines()
-                    empty_lines = [i for i, line in enumerate(lines) if line.strip() == '' or line.strip() == '\n']
+                    empty_lines: List[int] = [i for i, line in enumerate(lines) if line.strip() == '' or line.strip() == '\n']
             except Exception as e:
                 pass
             if empty_lines:
@@ -94,6 +118,16 @@ def show_empty_lines(directory, git_ignore_path):
 
 
 def main(directory, git_ignore_path):
+    """
+    Main function for the cloc script.
+
+    Scans the given directory and prints out a table of file types and their
+    corresponding line counts.
+
+    :param directory: The directory to scan
+    :param git_ignore_path: The path to the .gitignore file
+    """
+    
     info_dict = list_files_with_extensions(directory, git_ignore_path)
     visualize_info(info_dict)
 
