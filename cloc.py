@@ -136,6 +136,6 @@ def main(directory, git_ignore_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="The directory to scan")
-    parser.add_argument("--git-coount", help="The .gitcount file to use", default=None)
+    parser.add_argument("--git-count", help="The .gitcount file to use", default=None)
     args = parser.parse_args()
     
